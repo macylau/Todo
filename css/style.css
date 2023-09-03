@@ -1,0 +1,10 @@
+body {
+    background-color: rgb(92, 173, 146);
+}
+
+#container {
+    width: 50%;
+    background-color: rgb(243, 243, 243);
+    padding: 20px 40px;
+}
+
