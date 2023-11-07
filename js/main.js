@@ -8,7 +8,7 @@ let todos = [
     {
       todoID: 1,
       todoText: "Take toilet break",
-      todoComplete: true
+      todoComplete: false
     },
     {
       todoID: 2,
@@ -17,6 +17,8 @@ let todos = [
     }
   
 ];
+
+
 
 let inputField = document.querySelector(".inputField input");
 let addButton = document.querySelector(".inputField button");
@@ -47,10 +49,13 @@ function addTodo(todoText) {
   let newID = todos.length > 0 ? todos[todos.length - 1].todoID + 1 : 0;
   let newTodo = {
     todoID: newID,
-    todoText: todoText,
+    todoText,
     todoComplete: false
   };
   todos.push(newTodo);
+
+
+  
 
   let li = document.createElement("li");
   li.textContent = todoText;
