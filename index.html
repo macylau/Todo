@@ -8,15 +8,20 @@
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
   />
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <div id="container">
       <header>Todo List</header>
+
       <div class="inputField">
         <input type="text" id="newTask" placeholder="Enter new task" />
+        <select id="categorySelect" placeholder="Select Category"></select>
         <button><i class="fas fa-plus"></i></button>
+        <button id="addCategoryButton">Add Category</button>
       </div>
+
       <ul class="todoList">
       </ul>
       
@@ -26,6 +31,6 @@
       </div>
     </div>
 
-    <script src="js/main.js"></script>
+    <script src="main.js"></script>
 </body>
 </html>
