@@ -10,27 +10,40 @@ app.use(express.static("client"));
 
 let todos = [
     {
-      todoID: 0,
+      id: 0,
       todoText: "Get birthday present for Macy",
       todoComplete: false,
-      category: "Chore",
+      category: categories.id[0],
     },
     {
-      todoID: 1,
+      id: 1,
       todoText: "Take toilet break",
       todoComplete: false,
-      category: "Work",
+      category: categories.id[1],
     },
     {
-      todoID: 2,
+      id: 2,
       todoText: "Prank call classmate",
       todoComplete: false,
-      category: "School",
+      category: categories.id[2],
     }
   
 ];
 
-let categories = ['General', 'Work', 'School'];
+let categories = [
+  {
+    id: 0,
+    category: "General",
+  },
+  {
+    id: 1,
+    category: "Work",
+  },
+  {
+    id: 2,
+    category: "School",
+  }
+];
 
 // Get all todos
 app.get('/api/todos', (req, res) => {
