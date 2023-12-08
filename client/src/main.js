@@ -21,9 +21,11 @@ let todos = [
   
 ];
 
+let categories = ['General', 'Work', 'School'];
+
 let inputField = document.querySelector(".inputField input");
 let categorySelect = document.querySelector("#categorySelect");
-let addButton = document.querySelector(".inputField button");
+let addButton = document.querySelector("#addTodoButton");
 let todoList = document.querySelector(".todoList");
 let footer = document.querySelector(".footer span");
 let clearButton = document.querySelector(".footer button");
