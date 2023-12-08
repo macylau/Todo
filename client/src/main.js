@@ -4,7 +4,7 @@ let todos = [
       todoID: 0,
       todoText: "Get birthday present for Macy",
       todoComplete: false,
-      category: "Chore",
+      category: "General",
     },
     {
       todoID: 1,
