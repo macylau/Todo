@@ -21,7 +21,7 @@ let todos = [
   
 ];
 
-let categories = ['General', 'Work', 'School'];
+let categories = ['All', 'General', 'Work', 'School'];
 
 let inputField = document.querySelector(".inputField input");
 let categorySelect = document.querySelector("#categorySelect");
@@ -40,30 +40,55 @@ function initializeTodos() {
   updatePendingTasks();
 }
 
-  function addTodoToDom(todo) {
-    let li = document.createElement("li");
-    li.textContent = `${todo.todoText} - ${todo.category}`;
-    if (todo.todoComplete) {
-      li.classList.add("done");
-    }
-
-    let deleteIcon = document.createElement("span");
-    deleteIcon.innerHTML = '<i class="fa fa-trash"></i>';
-    deleteIcon.addEventListener("click", () => deleteTodo(todo.todoID));
-    li.appendChild(deleteIcon);
-    li.addEventListener("click", () => toggleComplete(todo.todoID));
-    todoList.appendChild(li);
+function addTodoToDom(todo) {
+  let li = document.createElement("li");
+  li.textContent = `${todo.todoText} - ${todo.category}`;
+  if (todo.todoComplete) {
+    li.classList.add("done");
   }
+  let deleteIcon = document.createElement("span");
+  deleteIcon.innerHTML = '<i class="fa fa-trash"></i>';
+  deleteIcon.addEventListener("click", () => deleteTodo(todo.todoID));
+  li.appendChild(deleteIcon);
+  li.addEventListener("click", () => toggleComplete(todo.todoID));
+  todoList.appendChild(li);
+}
 
-  function populateCategories() {
-    let uniqueCategories = [...new Set(todos.map((todo) => todo.category))];
-    uniqueCategories.forEach((category) => {
-      let option = document.createElement("option");
-      option.value = category;
-      option.text = category;
-      categorySelect.add(option);
+// Sort categories alphabetically
+function sortCategories() {
+  categories.sort();
+  
+  categorySelect.innerHTML = ''; // Clear existing options
+  categories.forEach((category) => {
+    let option = document.createElement("option");
+    option.value = category;
+    option.text = category;
+    categorySelect.add(option);
+  });
+}
+
+function displayTodosByCategory(selectedCategory) {
+  todoList.innerHTML = ''; // Clear existing todos
+
+  todos
+    .filter((todo) => selectedCategory === 'All' || todo.category === selectedCategory)
+    .forEach((todo) => {
+      addTodoToDom(todo);
     });
-  }  
+}
+
+function populateCategories() {
+  sortCategories();
+
+  // Add 'All' option to display all todos
+  let allOption = document.createElement("option");
+  allOption.value = 'All';
+  allOption.text = 'All';
+  categorySelect.add(allOption);
+
+  sortCategories();
+}  
+
 
 // Add a new todo
 function addTodo(todoText, selectedCategory) {
@@ -88,6 +113,7 @@ function toggleComplete(todoID) {
   li.classList.toggle("done");
 
   updatePendingTasks();
+  displayTodosByCategory(categorySelect.value);
 }
 
 // Delete a todo
@@ -97,6 +123,7 @@ function deleteTodo(todoID) {
   todoList.removeChild(todoList.children[todoIndex]);
 
   updatePendingTasks();
+  displayTodosByCategory(categorySelect.value);
 }
 
 // Update the pending tasks count
@@ -133,6 +160,9 @@ addButton.addEventListener("click", () => {
     let selectedCategory = categorySelect.value;
     addTodo(inputField.value.trim(), selectedCategory);
     inputField.value = "";
+
+    // Display todos based on the selected category
+    displayTodosByCategory(selectedCategory);
   }
 });
 
@@ -156,6 +186,10 @@ document.querySelector("#addCategoryButton").addEventListener("click", () => {
       alert("Category already exists!");
     }
   }
+});
+
+categorySelect.addEventListener("change", () => {
+  displayTodosByCategory(categorySelect.value);
 });
 
 initializeTodos();
