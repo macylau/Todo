@@ -221,3 +221,49 @@ displayTodosByCategory(categorySelect.value);
 });
 
 initializeTodos();
+
+
+// Edit Category
+document.querySelector("#editCategoryButton").addEventListener("click", () => {
+  let selectedCategory = categorySelect.value;
+  let editedCategory = prompt("Enter the new category name:", selectedCategory);
+
+  if (editedCategory && editedCategory !== selectedCategory) {
+    // Update the categories array
+    categories[categories.indexOf(selectedCategory)] = editedCategory;
+
+    // Update the categorySelect options
+    sortCategories();
+
+    // Update the category for all existing todos with the edited category
+    todos.forEach((todo) => {
+      if (todo.category === selectedCategory) {
+        todo.category = editedCategory;
+      }
+    });
+
+    // Display todos based on the selected category
+    displayTodosByCategory(editedCategory);
+  }
+});
+
+// Delete Category
+document.querySelector("#deleteCategoryButton").addEventListener("click", () => {
+  let selectedCategory = categorySelect.value;
+
+  if (selectedCategory !== "All") {
+    // Remove the category from the categories array
+    categories = categories.filter((category) => category !== selectedCategory);
+
+    sortCategories();
+    
+    todos.forEach((todo) => {
+      if (todo.category === selectedCategory) {
+        todo.category = "All"; 
+      }
+    });
+
+    // Display todos based on the selected category
+    displayTodosByCategory("All"); 
+  }
+});
