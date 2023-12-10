@@ -22,6 +22,21 @@ let todos = [
 
 let categories = ["General", "School", "Work"];
 
+let baseURL = 'http://localhost:3000'
+
+async function fetchData(endpoint, method, data) {
+  const response = await fetch(baseURL + endpoint, {
+    method: method,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+
+  return await response.json();
+}
+
+
 let inputField = document.querySelector(".inputField input");
 let categorySelect = document.querySelector("#categorySelect");
 let addButton = document.querySelector("#addTodoButton");

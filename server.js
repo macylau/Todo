@@ -13,19 +13,19 @@ let todos = [
     id: 0,
     todoText: "Get birthday present for Macy",
     todoComplete: false,
-    category: 0,
+    category: "General",
   },
   {
     id: 1,
     todoText: "Take toilet break",
     todoComplete: false,
-    category: 2,
+    category: "Work",
   },
   {
     id: 2,
     todoText: "Prank call classmate",
     todoComplete: false,
-    category: 1,
+    category: "School",
   },
 ];
 
