@@ -116,17 +116,25 @@ function populateCategories() {
 
 // Add a new todo
 function addTodo(todoText, selectedCategory) {
-  let newID = todos.length > 0 ? todos[todos.length - 1].todoID + 1 : 0;
-  let newTodo = {
-    todoID: newID,
-    todoText,
+  const newTodo = {
+    todoText: todoText,
     todoComplete: false,
     category: selectedCategory,
   };
-  todos.push(newTodo);
 
-  addTodoToDom(newTodo);
-  updatePendingTasks();
+  fetchData('/api/todo', 'POST', newTodo)
+    .then(response => {
+      // Assuming the server responds with the newly created todo
+      const createdTodo = response;
+
+      // Add the new todo to the local todos array
+      todos.push(createdTodo);
+
+      // Update the UI or perform other actions as needed
+      addTodoToDom(createdTodo);
+      updatePendingTasks();
+    })
+    .catch(error => console.error('Error adding todo:', error));
 }
 
 // Toggle todo completion

@@ -10,19 +10,19 @@ app.use(express.static("client"));
 
 let todos = [
   {
-    id: 0,
+    todoID: 0,
     todoText: "Get birthday present for Macy",
     todoComplete: false,
     category: "General",
   },
   {
-    id: 1,
+    todoID: 1,
     todoText: "Take toilet break",
     todoComplete: false,
     category: "Work",
   },
   {
-    id: 2,
+    todoID: 2,
     todoText: "Prank call classmate",
     todoComplete: false,
     category: "School",
@@ -49,20 +49,25 @@ app.get('/api/todos', (req, res) => {
     res.send(todos)
 })
 
+let nextTodoID = 3;
 // Post a new todo
 app.post('/api/todo', (req, res) => {
-    const newTodo = req.body;
-    todos.push(newTodo);
-    res.json(newTodo);
-  });
+  const newTodo = {
+    todoID: nextTodoID++, // Assign a unique ID and increment the counter
+    ...req.body,
+  };
+
+  todos.push(newTodo);
+  res.json(newTodo);
+});
 
 // Put (update) a todo
-app.put('/api/todo/:id', (req, res) => {
-    const id = parseInt(req.params.id);
+app.put('/api/todo/:todoID', (req, res) => {
+    const todoID = parseInt(req.params.todoID);
     const updatedTodo = req.body;
   
     // Find the index of the todo with the specified ID
-    const todoIndex = todos.findIndex((todo) => todo.id === id);
+    const todoIndex = todos.findIndex((todo) => todo.todoID === todoID);
   
     // Update the todo if found
     if (todoIndex !== -1) {
@@ -75,11 +80,11 @@ app.put('/api/todo/:id', (req, res) => {
 
 
 // Delete a todo
-app.delete('/api/todo/:id', (req, res) => {
-    const id = parseInt(req.params.id);
+app.delete('/api/todo/:todoID', (req, res) => {
+    const todoID = parseInt(req.params.todoID);
   
     // Remove the todo with the specified ID
-    todos = todos.filter((todo) => todo.id !== id);
+    todos = todos.filter((todo) => todo.todoID !== todoID);
   
     res.json({ success: true });
   });
