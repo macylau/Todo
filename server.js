@@ -86,10 +86,10 @@ app.delete('/api/todo/:id', (req, res) => {
   
   // Get all todos for a category
   app.get('/api/todos/category/:id', (req, res) => {
-    const category = req.params.category;
-    const categoryTodos = todos.filter((todo) => todo.category === category);
+    const categoryId = parseInt(req.params.id); // Use parseInt to convert id to a number
+    const categoryTodos = todos.filter((todo) => todo.category === categoryId);
     res.json(categoryTodos);
-  });
+});
   
   // Get all categories
   app.get('/api/categories', (req, res) => {
