@@ -10,36 +10,36 @@ app.use(express.static("client"));
 
 let todos = [
   {
-    id: 0,
+    todoID: 0,
     todoText: "Get birthday present for Macy",
     todoComplete: false,
-    category: 0,
+    category: "General",
   },
   {
-    id: 1,
+    todoID: 1,
     todoText: "Take toilet break",
     todoComplete: false,
-    category: 2,
+    category: "Work",
   },
   {
-    id: 2,
+    todoID: 2,
     todoText: "Prank call classmate",
     todoComplete: false,
-    category: 1,
+    category: "School",
   },
 ];
 
 let categories = [
   {
-    id: 0,
+    categoryId: 0,
     categoryName: "General",
   },
   {
-    id: 1,
+    categoryId: 1,
     categoryName: "School",
   },
   {
-    id: 2,
+    categoryId: 2,
     categoryName: "Work",
   },
 ];
@@ -49,20 +49,25 @@ app.get('/api/todos', (req, res) => {
     res.send(todos)
 })
 
+let nextTodoID = 3;
 // Post a new todo
 app.post('/api/todo', (req, res) => {
-    const newTodo = req.body;
-    todos.push(newTodo);
-    res.json(newTodo);
-  });
+  const newTodo = {
+    todoID: nextTodoID++, // Assign a unique ID and increment the counter
+    ...req.body,
+  };
+
+  todos.push(newTodo);
+  res.json(newTodo);
+});
 
 // Put (update) a todo
-app.put('/api/todo/:id', (req, res) => {
-    const id = parseInt(req.params.id);
+app.put('/api/todo/:todoID', (req, res) => {
+    const todoID = parseInt(req.params.todoID);
     const updatedTodo = req.body;
   
     // Find the index of the todo with the specified ID
-    const todoIndex = todos.findIndex((todo) => todo.id === id);
+    const todoIndex = todos.findIndex((todo) => todo.todoID === todoID);
   
     // Update the todo if found
     if (todoIndex !== -1) {
@@ -75,18 +80,18 @@ app.put('/api/todo/:id', (req, res) => {
 
 
 // Delete a todo
-app.delete('/api/todo/:id', (req, res) => {
-    const id = parseInt(req.params.id);
+app.delete('/api/todo/:todoID', (req, res) => {
+    const todoID = parseInt(req.params.todoID);
   
     // Remove the todo with the specified ID
-    todos = todos.filter((todo) => todo.id !== id);
+    todos = todos.filter((todo) => todo.todoID !== todoID);
   
     res.json({ success: true });
   });
   
   // Get all todos for a category
-  app.get('/api/todos/category/:id', (req, res) => {
-    const categoryId = parseInt(req.params.id); // Use parseInt to convert id to a number
+  app.get('/api/todos/category/:categoryId', (req, res) => {
+    const categoryId = parseInt(req.params.categoryId); // Use parseInt to convert id to a number
     const categoryTodos = todos.filter((todo) => todo.category === categoryId);
     res.json(categoryTodos);
 });
@@ -96,20 +101,24 @@ app.delete('/api/todo/:id', (req, res) => {
     res.json(categories);
   });
 
+  let nextCategoryId = 3;
   // Post a new category
-app.post('/api/category', (req, res) => {
-    const newCategory = req.body;
+  app.post('/api/category', (req, res) => {
+    const newCategory = {
+      categoryId: nextCategoryId++,
+      ...req.body,
+    };
     categories.push(newCategory);
     res.json(newCategory);
   });
   
   // Put (update) a category
-  app.put('/api/category/:id', (req, res) => {
-    const id = parseInt(req.params.id);
+  app.put('/api/category/:categoryId', (req, res) => {
+    const categoryId = parseInt(req.params.categoryId);
     const updatedCategory = req.body;
   
     // Find the index of the category with the specified ID
-    const categoryIndex = categories.findIndex((category) => category.id === id);
+    const categoryIndex = categories.findIndex((category) => category.categoryId === categoryId);
   
     // Update the category if found
     if (categoryIndex !== -1) {
@@ -120,16 +129,19 @@ app.post('/api/category', (req, res) => {
     }
   });
   
-  // Delete category
-  app.delete('/api/category/:id', (req, res) => {
-    const id = parseInt(req.params.id);
-  
-    // Remove the todo with the specified ID
-    categories = categories.filter((category) => category.id !== id);
-  
-    res.json({ success: true });
-  });
-  
+// Delete category
+app.delete('/api/category/:categoryId', (req, res) => {
+  const categoryId = parseInt(req.params.categoryId);
+
+  // Log the received category ID
+  console.log('Received category ID:', categoryId);
+
+  // Remove the category with the specified ID
+  categories = categories.filter((category) => category.categoryId !== categoryId);
+
+  res.json({ success: true });
+});
+
   // Start the server
   app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
