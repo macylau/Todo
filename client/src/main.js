@@ -22,27 +22,6 @@ let todos = [
 
 let categories = ["General", "School", "Work"];
 
-let baseURL = 'http://localhost:3000'
-
-async function fetchData(endpoint, method, data) {
-  try {
-    const response = await fetch(baseURL + endpoint, {
-      method: method,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-
-    return await response.json();
-  } catch (error) {
-    console.error('Fetch error:', error);
-    throw error;
-  }
-}
-
-
-
 let inputField = document.querySelector(".inputField input");
 let categorySelect = document.querySelector("#categorySelect");
 let addButton = document.querySelector("#addTodoButton");
@@ -122,81 +101,38 @@ function populateCategories() {
 
 // Add a new todo
 function addTodo(todoText, selectedCategory) {
-  const category =
-    typeof selectedCategory === 'string' ? selectedCategory : selectedCategory.categoryName;
-
-  const newTodo = {
-    todoText: todoText,
+  let newID = todos.length > 0 ? todos[todos.length - 1].todoID + 1 : 0;
+  let newTodo = {
+    todoID: newID,
+    todoText,
     todoComplete: false,
-    category: category,
+    category: selectedCategory,
   };
+  todos.push(newTodo);
 
-  fetchData('/api/todo', 'POST', newTodo)
-    .then(response => {
-      // Assuming the server responds with the newly created todo
-      const createdTodo = response;
-
-      // Add the new todo to the local todos array
-      todos.push(createdTodo);
-
-      // Update the UI or perform other actions as needed
-      addTodoToDom(createdTodo);
-      updatePendingTasks();
-    })
-    .catch(error => console.error('Error adding todo:', error));
+  addTodoToDom(newTodo);
+  updatePendingTasks();
 }
-
 
 // Toggle todo completion
 function toggleComplete(todoID) {
-  const todoIndex = todos.findIndex((todo) => todo.todoID === todoID);
+  let todoIndex = todos.findIndex((todo) => todo.todoID === todoID);
+  todos[todoIndex].todoComplete = !todos[todoIndex].todoComplete;
+  let li = todoList.children[todoIndex];
+  li.classList.toggle("done");
 
-  // Ensure the todoID exists in the array
-  if (todoIndex !== -1) {
-    // Toggle the todoComplete status
-    todos[todoIndex].todoComplete = !todos[todoIndex].todoComplete;
-
-    // Update the UI based on the new status
-    const li = todoList.children[todoIndex];
-    li.classList.toggle("done", todos[todoIndex].todoComplete);
-
-    // Update pending tasks and display todos by category
-    updatePendingTasks();
-    displayTodosByCategory(categorySelect.value);
-
-    // Make the fetch call to update the server
-    fetchData(`/api/todo/${todoID}`, 'PUT', { todoComplete: todos[todoIndex].todoComplete })
-      .then(response => {
-        // Handle the response if needed
-        console.log(response);
-      })
-      .catch(error => console.error('Error updating todo:', error));
-  }
+  updatePendingTasks();
+  displayTodosByCategory(categorySelect.value);
 }
 
 // Delete a todo
 function deleteTodo(todoID) {
-  const todoIndex = todos.findIndex((todo) => todo.todoID === todoID);
+  let todoIndex = todos.findIndex((todo) => todo.todoID === todoID);
+  todos.splice(todoIndex, 1);
+  todoList.removeChild(todoList.children[todoIndex]);
 
-  if (todoIndex !== -1) {
-    // Remove the todo from the client-side array
-    todos.splice(todoIndex, 1);
-
-    // Remove the todo from the UI
-    todoList.removeChild(todoList.children[todoIndex]);
-
-    // Update pending tasks and display todos by category
-    updatePendingTasks();
-    displayTodosByCategory(categorySelect.value);
-
-    // Make the fetch call to delete the todo on the server
-    fetchData(`/api/todo/${todoID}`, 'DELETE')
-      .then(response => {
-        // Handle the response if needed
-        console.log(response);
-      })
-      .catch(error => console.error('Error deleting todo:', error));
-  }
+  updatePendingTasks();
+  displayTodosByCategory(categorySelect.value);
 }
 
 // Update the pending tasks count
@@ -209,23 +145,11 @@ function updatePendingTasks() {
 
 // Clear completed todos
 function clearDone() {
-  // Filter out completed todos on the client side
   todos = todos.filter((todo) => !todo.todoComplete);
-
-  // Remove completed todos from the UI
-  const completedLiElements = Array.from(todoList.getElementsByClassName("done"));
+  let completedLiElements = Array.from(todoList.getElementsByClassName("done"));
   completedLiElements.forEach((li) => todoList.removeChild(li));
 
-  // Update pending tasks
   updatePendingTasks();
-
-  // Make the fetch call to clear completed todos on the server
-  fetchData(`/api/todo/${todoID}`, 'DELETE')
-    .then(response => {
-      // Handle the response if needed
-      console.log(response);
-    })
-    .catch(error => console.error('Error clearing completed todos:', error));
 }
 
 // Add new todo with Enter key
@@ -250,35 +174,45 @@ addButton.addEventListener("click", () => {
 
 clearButton.addEventListener("click", clearDone);
 
-// Add new Category
-document.querySelector("#addCategoryButton").addEventListener("click", async () => {
-  const newCategory = prompt("Enter new category:");
-
+document.querySelector("#addCategoryButton").addEventListener("click", () => {
+  let newCategory = prompt("Enter new category:");
   if (newCategory) {
-    const existingCategory = categories.find(category => category === newCategory);
+    let existingCategory = Array.from(categorySelect.options).find(
+      (option) => option.value === newCategory
+    );
 
     if (!existingCategory) {
-      // Make the fetch call to add the category on the server
-      try {
-        const response = await fetchData('/api/category', 'POST', { categoryName: newCategory });
+      // Add the new category to the categories array
+      categories.push(newCategory);
+      categories.sort();
 
-        // Assuming the server responds with the newly created category
-        const createdCategory = response;
+      // Clear existing options
+      categorySelect.innerHTML = "";
 
-        // Add the new category to the client-side array (only the category name)
-        categories.push(createdCategory.categoryName);
+      // Add 'All' option to display all todos
+      let allOption = document.createElement("option");
+      allOption.value = "All";
+      allOption.text = "All";
+      categorySelect.add(allOption);
 
-        // Sort and update categories in the dropdown
-        sortCategories();
-      } catch (error) {
-        console.error('Error adding category:', error);
-      }
+      // Add sorted categories to the dropdown
+      categories.forEach((category) => {
+        let option = document.createElement("option");
+        option.value = category;
+        option.text = category;
+        categorySelect.add(option);
+      });
     } else {
       alert("Category already exists!");
     }
   }
 });
 
+categorySelect.addEventListener("change", () => {
+  displayTodosByCategory(categorySelect.value);
+});
+
+initializeTodos();
 
 // Edit Category
 document.querySelector("#editCategoryButton").addEventListener("click", () => {
@@ -324,10 +258,3 @@ document
       displayTodosByCategory("All");
     }
   });
-
-
-  categorySelect.addEventListener("change", () => {
-  displayTodosByCategory(categorySelect.value);
-});
-
-initializeTodos();
