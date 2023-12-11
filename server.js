@@ -31,15 +31,15 @@ let todos = [
 
 let categories = [
   {
-    id: 0,
+    categoryId: 0,
     categoryName: "General",
   },
   {
-    id: 1,
+    categoryId: 1,
     categoryName: "School",
   },
   {
-    id: 2,
+    categoryId: 2,
     categoryName: "Work",
   },
 ];
@@ -90,8 +90,8 @@ app.delete('/api/todo/:todoID', (req, res) => {
   });
   
   // Get all todos for a category
-  app.get('/api/todos/category/:id', (req, res) => {
-    const categoryId = parseInt(req.params.id); // Use parseInt to convert id to a number
+  app.get('/api/todos/category/:categoryId', (req, res) => {
+    const categoryId = parseInt(req.params.categoryId); // Use parseInt to convert id to a number
     const categoryTodos = todos.filter((todo) => todo.category === categoryId);
     res.json(categoryTodos);
 });
@@ -101,20 +101,24 @@ app.delete('/api/todo/:todoID', (req, res) => {
     res.json(categories);
   });
 
+  let nextCategoryId = 3;
   // Post a new category
-app.post('/api/category', (req, res) => {
-    const newCategory = req.body;
+  app.post('/api/category', (req, res) => {
+    const newCategory = {
+      categoryId: nextCategoryId++,
+      ...req.body,
+    };
     categories.push(newCategory);
     res.json(newCategory);
   });
   
   // Put (update) a category
-  app.put('/api/category/:id', (req, res) => {
-    const id = parseInt(req.params.id);
+  app.put('/api/category/:categoryId', (req, res) => {
+    const categoryId = parseInt(req.params.categoryId);
     const updatedCategory = req.body;
   
     // Find the index of the category with the specified ID
-    const categoryIndex = categories.findIndex((category) => category.id === id);
+    const categoryIndex = categories.findIndex((category) => category.categoryId === categoryId);
   
     // Update the category if found
     if (categoryIndex !== -1) {
@@ -125,16 +129,19 @@ app.post('/api/category', (req, res) => {
     }
   });
   
-  // Delete category
-  app.delete('/api/category/:id', (req, res) => {
-    const id = parseInt(req.params.id);
-  
-    // Remove the todo with the specified ID
-    categories = categories.filter((category) => category.id !== id);
-  
-    res.json({ success: true });
-  });
-  
+// Delete category
+app.delete('/api/category/:categoryId', (req, res) => {
+  const categoryId = parseInt(req.params.categoryId);
+
+  // Log the received category ID
+  console.log('Received category ID:', categoryId);
+
+  // Remove the category with the specified ID
+  categories = categories.filter((category) => category.categoryId !== categoryId);
+
+  res.json({ success: true });
+});
+
   // Start the server
   app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
